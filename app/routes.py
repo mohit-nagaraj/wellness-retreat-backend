@@ -1,11 +1,15 @@
-from flask import Blueprint, jsonify, request
-from app.models import Retreats
 from sqlalchemy import or_
+from datetime import datetime
+from flask import Blueprint, jsonify, request
+
+from . import db
+from app.models.retreats import Retreats
+from app.models.bookings import Bookings
 
 main = Blueprint('main', __name__)
 
 
-@main.route('/retreats', methods=['GET'])
+@main.route('/api/retreats', methods=['GET'])
 def get_retreats():
     # Get query parameters with default values
     filter_term = request.args.get('filter', '')
@@ -49,3 +53,32 @@ def get_retreats():
         'per_page': limit,
         'retreats': [retreat.to_dict() for retreat in retreats]
     })
+
+
+@main.route('/api/book', methods=['POST'])
+def book_retreat():
+    data = request.get_json()
+
+    # Check if the user has already booked the retreat
+    existing_booking = Bookings.query.filter_by(
+        user_id=data['user_id'], retreat_id=data['retreat_id']).first()
+    if existing_booking:
+        return jsonify({"error": "User has already booked this retreat"}), 400
+
+    new_booking = Bookings(
+        user_id=data['user_id'],
+        user_name=data['user_name'],
+        user_email=data['user_email'],
+        user_phone=data['user_phone'],
+        retreat_id=data['retreat_id'],
+        retreat_title=data['retreat_title'],
+        retreat_location=data['retreat_location'],
+        retreat_price=data['retreat_price'],
+        retreat_duration=data['retreat_duration'],
+        payment_details=data['payment_details'],
+        booking_date=datetime.fromisoformat(data['booking_date'])
+    )
+    db.session.add(new_booking)
+    db.session.commit()
+
+    return jsonify(new_booking.to_dict()), 201
