@@ -6,7 +6,7 @@
   "tasks": {
     "start": {
       "name": "start",
-      "command": "python main.py",
+      "command": "python run.py",
       "runAtStart": true,
       "preview": {
         "port": 5000
