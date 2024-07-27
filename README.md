@@ -1,4 +1,5 @@
 # Retreat Booking API
+Postman documentation: https://documenter.getpostman.com/view/29989847/2sA3kaAyP6
 
 ## Overview
 The Retreat Booking API is a Flask-based application that allows users to book retreats, filter retreats, paginate results, and search for specific retreats. The API supports various endpoints to manage retreats and bookings.
